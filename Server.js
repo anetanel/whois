@@ -30,11 +30,10 @@ function authenticate(req, res) {
         let username = creds[0];
         let password = creds[1];
 
-        if(USER_PASS[username] === password) {   // Is the username/password correct?
+        if (USER_PASS[username] === password) {   // Is the username/password correct?
             res.statusCode = 200;  // OK
             return true;
-        }
-        else {
+        } else {
             // res.statusCode = 401; // Force them to retry authentication
             // res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
 
@@ -55,12 +54,13 @@ function wClient(refer, target, res) {
     });
 
     socket.on('end', () => { // Got all data from the server
-        res.write('---------------START----------------\n')
-        res.write(data.toString());
-        res.write('---------------END------------------\n')
-        let dataStr = data.toString();
-        console.log(dataStr);
-        if (dataStr.search('refer:') > 0) { // find refer in data string
+        let pretty_data = data.replace(/[%#].*\n/g, '').replace(/\n{2,}/g, "\n");
+        res.write('\n---------------START----------------\n');
+        res.write(pretty_data);
+        res.write('\n---------------END------------------\n');
+        console.log(data);
+
+        if (data.search('refer:') > 0) { // found refer in data string
             let next_refer = data.toString().match('refer:.*\n')[0].split(":")[1].trim() // isolate fefer address
             console.log(`got next refer: ${next_refer}`);
             wClient(next_refer, target, res)
