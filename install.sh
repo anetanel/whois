@@ -2,9 +2,14 @@
 
 if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
 
-echo This installer will install the following packages: curl, nodejs
+echo This installer will do the following:
+echo * install curl
+echo * download and run an installation script from deb.nodesource.com to install the NodeSource Node.js 10.x repo
+echo * install nodejs
+echo * create a private key and certificate to use with the HTTPS server
+echo
 read -p "Do you wish to continue? (y/n)" -n 1 -r
-if [[ ! $REPLY =~ ^[Yy]$ ]] ; then exit 1 ; fi
+if [[ ! $REPLY =~ ^[Yy]$ ]] ; then echo;exit 1 ; fi
 
 echo -e \\n----- Installing prerequisites -----
 apt-get install -y curl
