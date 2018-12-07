@@ -3,13 +3,14 @@ const net = require('net');
 const fs = require('fs');
 
 const WHOIS_ROOT = 'whois.iana.org';
-const PORT = 43;
+const WHOIS_PORT = 43;
 const USER_PASS = {
     'netanel': '1234',
     'admin': 'admin',
     'hax0r': 'password',
     'user': 'pass'
 };
+const WEB_PORT = 8443;
 
 const options = {
     key: fs.readFileSync('privateKey.key'),
@@ -26,7 +27,7 @@ https.createServer(options, (req, res) => { // Start https server and call wClie
     } else {
         res.end(`Could not find a valid IP address in '${req.url}'\n`);
     }
-}).listen(8443);
+}).listen(WEB_PORT);
 
 function authenticate(req, res) {
     let auth = req.headers['authorization'];
@@ -100,7 +101,7 @@ function wClient(refer, target, res) {
         res.end(`Error getting ${target} whois information.\n${err.toString()}\n`);
     });
 
-    socket.connect(PORT, refer, () => {
+    socket.connect(WHOIS_PORT, refer, () => {
         // console.log(`whois server: ${refer}, target: ${target}`);
         socket.write(target + '\r\n');
     });

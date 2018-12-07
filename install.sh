@@ -2,6 +2,10 @@
 
 if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
 
+echo This installer will install the following packages: curl, nodejs
+read -p "Do you wish to continue? (y/n)" -n 1 -r
+if [[ ! $REPLY =~ ^[Yy]$ ]] ; then exit 1 ; fi
+
 echo -e \\n----- Installing prerequisites -----
 apt-get install -y curl
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
