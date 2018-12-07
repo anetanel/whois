@@ -1,5 +1,6 @@
-const http = require('http');
+const https = require('https');
 const net = require('net');
+const fs = require('fs');
 
 const WHOIS_ROOT = 'whois.iana.org';
 const PORT = 43;
@@ -10,7 +11,12 @@ const USER_PASS = {
     'user': 'pass'
 };
 
-http.createServer((req, res) => { // Start http server and call wClient for each request
+const options = {
+    key: fs.readFileSync('privateKey.key'),
+    cert: fs.readFileSync('certificate.crt')
+};
+
+https.createServer(options, (req, res) => { // Start https server and call wClient for each request
     if (!authenticate(req, res)) return;
 
     let target = getIpFromUrl(req.url);
@@ -20,7 +26,7 @@ http.createServer((req, res) => { // Start http server and call wClient for each
     } else {
         res.end(`Could not find a valid IP address in '${req.url}'\n`);
     }
-}).listen(8080);
+}).listen(8443);
 
 function authenticate(req, res) {
     let auth = req.headers['authorization'];
@@ -85,9 +91,9 @@ function wClient(refer, target, res) {
         }
     });
 
-    socket.on('close', () => {
-        console.log('Connection closed');
-    });
+    // socket.on('close', () => {
+    //     console.log('Connection closed');
+    // });
 
     socket.on('error', err => {
         console.error('error: ', err);
