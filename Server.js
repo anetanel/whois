@@ -17,7 +17,7 @@ const options = {
     cert: fs.readFileSync('certificate.crt')
 };
 
-server = https.createServer(options, (req, res) => { // Start https server and call wClient for each request
+https.createServer(options, (req, res) => { // Start https server and call wClient for each request
     if (!authenticate(req, res)) return;
 
     let target = getIpFromUrl(req.url);
@@ -27,9 +27,9 @@ server = https.createServer(options, (req, res) => { // Start https server and c
     } else {
         res.end(`Could not find a valid IP address in '${req.url}'\n`);
     }
-}).listen(WEB_PORT);
-
-if (server.listening) console.log(`listening on secure port ${WEB_PORT}`);
+}).listen(WEB_PORT).on('listening', () => {
+    console.log(`listening on secure port ${WEB_PORT}`)
+});
 
 function authenticate(req, res) {
     let auth = req.headers['authorization'];
