@@ -18,9 +18,9 @@ const options = {
 };
 
 const server = https.createServer(options, (req, res) => { // Start https server and call wClient for each request
-    if (!authenticate(req, res)) return;
+    if (!authenticate(req, res)) return; // check authentication
 
-    let target = getIpFromUrl(req.url);
+    let target = getIpFromUrl(req.url); // verify valid IP in url
     if (target) {
         res.write(`IP in url is '${target}'\n`);
         wClient(WHOIS_ROOT, target, res)
@@ -34,7 +34,6 @@ server.on('error', err => console.error(err.toString()));
 
 function authenticate(req, res) {
     let auth = req.headers['authorization'];
-    // console.log('Authorization Header is: ', auth);
 
     if (!auth) { // no authentication given
         res.statusCode = 401;
@@ -47,12 +46,11 @@ function authenticate(req, res) {
     let buf = Buffer.from(tmp[1], 'base64');
     let plainAuth = buf.toString();
 
-    // console.log('Decoded Authorization ', plainAuth);
     let creds = plainAuth.split(':');
     let username = creds[0];
     let password = creds[1];
 
-    if (USER_PASS[username] !== password) {
+    if (USER_PASS[username] !== password) { // check given auth against USER_PASS "database"
         res.statusCode = 403;
         res.end('You shall not pass\n');
         return false;
