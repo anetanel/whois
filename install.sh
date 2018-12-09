@@ -21,4 +21,4 @@ openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.k
 
 echo -e \\n----- Done -----
 echo 'Set env. variable WEB_PORT to change default port (8443).'
-echo 'Run 'node Server.js &' to start the server.'
+echo Run \'node Server.js \&\' to start the server.
