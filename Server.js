@@ -10,14 +10,14 @@ const USER_PASS = {
     'hax0r': 'password',
     'user': 'pass'
 };
-const WEB_PORT = 8443;
+const WEB_PORT = process.env.WEB_PORT || 8443; // if env. variable WEB_PORT is not set, use 8443
 
 const options = {
     key: fs.readFileSync('privateKey.key'),
     cert: fs.readFileSync('certificate.crt')
 };
 
-server = https.createServer(options, (req, res) => { // Start https server and call wClient for each request
+const server = https.createServer(options, (req, res) => { // Start https server and call wClient for each request
     if (!authenticate(req, res)) return;
 
     let target = getIpFromUrl(req.url);
@@ -77,27 +77,18 @@ function wClient(refer, target, res) {
         res.write('\n---------------START----------------\n');
         res.write(prettyData);
         res.write('\n---------------END------------------\n');
-        // console.log(data);
 
         if (data.search('refer:') > 0) { // found refer: in data string, so querying it for our target ip
             let nextRefer = data.match('refer:.*\n')[0].split(':')[1].trim(); // isolate refer address
-            // console.log(`got next refer: ${nextRefer}`);
             wClient(nextRefer, target, res);
         } else if (prettyData.search(':') < 0) { // data does not look like key-value. query again with handle/id instead of IP
-            // console.log('digging deeper...');
             let nextTarget = prettyData.split('\n').slice(-1)[0].split(/[()]/)[1]; // extract handle/id from parentheses of last entry
-            // console.log(`nextTarget = ${nextTarget}`);
             wClient(refer, nextTarget, res);
         } else {
-            // console.log('made it to the end..');
             socket.destroy();
             res.end();
         }
     });
-
-    // socket.on('close', () => {
-    //     console.log('Connection closed');
-    // });
 
     socket.on('error', err => {
         console.error('error: ', err);
@@ -105,7 +96,6 @@ function wClient(refer, target, res) {
     });
 
     socket.connect(WHOIS_PORT, refer, () => {
-        // console.log(`whois server: ${refer}, target: ${target}`);
         socket.write(target + '\r\n');
     });
 }
